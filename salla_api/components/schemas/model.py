@@ -83,7 +83,8 @@ class Product(BaseModel):
         None, description="The product status. available values 'hidden','sale','out'"
     )
     product_type: Optional[str] = Field(None, description='Product type')
-    quantity: Optional[float] = Field(None, description='Product quantity')
+    # Code modified
+    quantity: Optional[int] = Field(None, description='Product quantity')
     unlimited_quantity: Optional[bool] = Field(
         None, description='Show if this product has unlimited quantity or not'
     )
