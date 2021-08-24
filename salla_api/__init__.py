@@ -8,7 +8,6 @@ class SallaAPI:
     base_url = "https://api.salla.dev/admin/v2"
 
     def __init__(self, api_key):
-        # self.session = requests_cache.CachedSession('amazon')
         self.session = requests.Session()
         self.session.headers.update({
             "Authorization": "Bearer {}".format(api_key)
@@ -35,6 +34,23 @@ class SallaAPI:
 
         return ProductResponse(**resp_json)
 
+    def update_product(self, product: int, data: Union[ProductUpdateRequest, Dict]) -> Union[ProductResponse, NotFoundResponse, ValidationResponse, Dict]:
+        method = 'put'
+        url = self.base_url + f"/products/{product}"
+
+        data = data if isinstance(data, dict) else data.dict()
+
+        resp = self.session.request(method, url, data=data)
+        resp_json = resp.json()
+
+        status_class = {
+            201: ProductResponse,
+            404: NotFoundResponse,
+            422: ValidationResponse,
+        }
+
+        return status_class[resp_json['status']](**resp_json)
+
     def product_details_by_sku(self, sku: str) -> Union[ProductResponse, NotFoundResponse]:
         url = self.base_url + f"/products/sku/{sku}"
         resp = self.session.get(url)
@@ -45,9 +61,18 @@ class SallaAPI:
 
         return ProductResponse(**resp_json)
 
-    def update_product_price_by_sku(self, sku: str, price):
+    def update_product_price_by_sku(self, sku: str, data: Union[ProductPriceRequest, Dict]) -> Union[ProductResponse, NotFoundResponse, ValidationResponse]:
         url = self.base_url + f"/products/sku/{sku}/price"
-        resp = self.session.post(url, data={'price': price})
+
+        # resp = self.session.post(url, data={'price': price})
+        resp = self.session.post(url, data=data.dict())
+        # TODO correct return type
+        return resp.json()
+
+    def update_product_quantity_by_sku(self, sku: str, data: Union[ProductQuantityRequest, Dict]) -> Union[ProductQuantityResponse, NotFoundResponse, ValidationResponse]:
+        url = self.base_url + f"/products/quantities/bySku/{sku}"
+        resp = self.session.post(url, data=data.dict())
+        # TODO correct return type
         return resp.json()
 
     def list_product_variants(self, product: int) -> Union[ProductVariantsResponse, NotFoundResponse]:

@@ -9,6 +9,15 @@ from typing import Any, List, Optional, Union, Dict
 
 from pydantic import BaseModel, Field, confloat, constr
 
+# Type Change
+# status, rate, maximum_quantity_per_order, count, total, currentPage, totalPages, hex_icon, sort_order, sort, rate, quantity, min_items_count, sort_order, code, stock_quantity, max_items_per_user: float -> int
+# id, city_id, country_id, customer_id, status_id, branch_id: float -> int
+# option_id: str -> int
+# timezone_type??
+
+# Replace
+# UrLs -> URLs
+
 
 class Conditions(BaseModel):
     """
@@ -563,14 +572,14 @@ class BrandRequest(BaseModel):
 
 
 class BrandResponse(BaseModel):
-    status: Optional[float] = Field(None, description='Response status code')
+    status: Optional[int] = Field(None, description='Response status code')
     success: Optional[bool] = Field(None, description='Response flag')
     data: Optional[Brand]
 
 
 class BrandsResponse(BaseModel):
     success: Optional[bool] = Field(None, description='Response flag')
-    status: Optional[float] = Field(None, description='Response status code')
+    status: Optional[int] = Field(None, description='Response status code')
     data: Optional[List[Brand]] = Field(None, min_items=1)
     pagination: Optional[Pagination]
 
@@ -971,12 +980,14 @@ class DeleteSuccessResponse(BaseModel):
 
 
 class Error(BaseModel):
-    code: Optional[float] = Field(None, description='Response code')
+    # Code modified
+    code: Optional[Union[int, str]] = Field(None, description='Response code')
     message: Optional[str] = Field(None, description='Response message')
 
 
 class NotFoundResponse(BaseModel):
-    status: Optional[float] = Field(None, description='Response status code')
+    # Code modified
+    status: Optional[int] = Field(None, description='Response status code')
     success: Optional[bool] = Field(None, description='Response flag')
     error: Optional[Error]
 
@@ -2078,7 +2089,11 @@ class Customer(BaseModel):
     id: Optional[int] = Field(None, description="Customer's ID")
     first_name: Optional[str] = Field(None, description="Customer's first name")
     last_name: Optional[str] = Field(None, description="Customer's last name")
-    mobile: Optional[float] = Field(
+    # mobile: Optional[float] = Field(
+    #     None, description="Customer's mobile number, without country code"
+    # )
+    # Custom code
+    mobile: Optional[str] = Field(
         None, description="Customer's mobile number, without country code"
     )
     mobile_code: Optional[str] = Field(
@@ -2126,7 +2141,7 @@ class ProductValue(BaseModel):
         None,
         description="The display value in UI based on display type of option, by default will use the name of value as display value when the 'display_value=text', but in case you used 'image' then you need to set the image id as value You can upload a new image to product using attach image endpoint then use 'image' id from response, otherwise when use 'color' as display type you need to pass the color for example '#000' for black color",
     )
-    option_id: Optional[str] = Field(None, description='Option id')
+    option_id: Optional[int] = Field(None, description='Option id')
     image_url: Optional[str] = Field(
         None, description='Value image url if option.type = image'
     )
@@ -2522,9 +2537,13 @@ class ProductDetails(BaseModel):
         None, description='Is there a tax applied to th product or not'
     )
     url: Optional[str] = Field(None, description='Product url')
+    # Custom code
     images: Optional[List[Image]] = Field(
-        None, description='Product images', min_items=1
+        None, description='Product images', min_items=0
     )
+    # images: Optional[List[Image]] = Field(
+    #     None, description='Product images', min_items=1
+    # )
     sold_quantity: Optional[int] = Field(None, description='Product sold quantity')
     sold_quantity_desc: Optional[str] = Field(
         None, description='Product sold quantity description'
